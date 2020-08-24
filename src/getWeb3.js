@@ -9,7 +9,7 @@ const getWeb3 = () => {
                 web3 = new Web3(web3.currentProvider);
                 resolve(web3);
             } else {
-                console.error("No provider found, please install Metamask");
+                console.error("No se encontró el proveedor, instale Metamask");
                 reject();
             }
         });

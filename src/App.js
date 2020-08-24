@@ -39,10 +39,10 @@ export class App extends Component {
             const { customer, price, flight } = result.args;
 
             if (customer === this.state.account) {
-                console.log(`You purchased a flight to ${flight} with a cost of ${price}`);
+                console.log(`Has comprado una pasaje a ${flight} por el precio de ${price} ETH`);
             } else {
-                this.container.success(`Last customer purchased a flight to ${flight}
-                with a cost of ${price}`, 'Flight information');
+                this.container.success(`El último cliente compró un pasaje a ${flight}
+                por el precio de ${price} ETH`, 'Informacion de Compra');
             }
 
         }.bind(this));
@@ -113,42 +113,62 @@ export class App extends Component {
 
     render() {
         return <React.Fragment>
-            <div className="jumbotron">
-                <h4 className="display-4">Welcome to the Airline!</h4>
+            <div className="jumbotron" style={{ backgroundImage: "url(" + "https://www.cruzdelsur.com.pe/assets/images/servicios/sliders/evolution.jpg" + ")", color:"white", paddingTop: 50, paddingBottom: 150, fontWeight: "bold"}} >
+                <h4 className="display-4" style={{backgroundColor: "#47484A"}}>Empresa de transportes Cruz del Sur</h4>
             </div>
 
             <div className="row">
-                <div className="col-sm">
-                    <Panel title="Balance">
-                        <p><strong>{this.state.account}</strong></p>
-                        <span><strong>Balance</strong>: {this.state.balance}</span>
+                <div className="col-sm" style={{ backgroundColor: "#005592 !important" }}>
+                    <Panel title="Saldo acumulado"  >
+                        <p><strong>Cliente: {this.state.account}</strong></p>
+                        <hr></hr>
+                        <span><strong>Saldo actual</strong>: {this.state.balance} ETH</span>
+                        <hr></hr>
+                        <span><strong>Total puntos</strong>: {this.state.refundableEther} ETH</span>
+                        <button className="btn bg-success text-white"
+                            onClick={this.refundLoyaltyPoints.bind(this)}>Cobrar mis puntos</button>
                     </Panel>
                 </div>
                 <div className="col-sm">
-                    <Panel title="Loyalty points - refundable ether">
-                        <span>{this.state.refundableEther} eth</span>
-                        <button className="btn btn-sm bg-success text-white"
-                            onClick={this.refundLoyaltyPoints.bind(this)}>Refund</button>
-                    </Panel>
-                </div>
-            </div>
-            <div className="row">
-                <div className="col-sm">
-                    <Panel title="Available flights">
+                    <Panel title="Destinos - Perú" style={{backgroundColor: "#47484A" }}>
                         {this.state.flights.map((flight, i) => {
                             return <div key={i}>
-                                <span>{flight.name} - cost: {this.toEther(flight.price)}</span>
-                                <button className="btn btn-sm btn-success text-white" onClick={() => this.buyFlight(i, flight)}>Purchase</button>
+                                <div className="row">
+                                    <div className="col-sm"> 
+                                        <span>{flight.name} </span>
+                                    </div>
+                                    <div className="col-sm"> 
+                                        <span> Precio: {this.toEther(flight.price)} ETH</span>
+                                    </div>                                    
+                                    <div className="col-sm"> 
+                                    <button className="btn btn-success text-white" onClick={() => this.buyFlight(i, flight)}>Comprar pasaje</button>
+                                    </div>                                    
+                                </div>
+
                             </div>
                         })}
 
                     </Panel>
                 </div>
+            </div>
+            <div className="row">
+
                 <div className="col-sm">
-                    <Panel title="Your flights">
+                    <Panel title="Historial de mis compras" style={{backgroundColor: "#47484A" }}>
                         {this.state.customerFlights.map((flight, i) => {
                             return <div key={i}>
-                                {flight.name} - cost: {flight.price}
+
+                               <div className="row">
+                                    <div className="col-sm"> 
+                                        <span> Pasaje comprado...  </span>
+                                    </div>                                   
+                                    <div className="col-sm"> 
+                                        <span> <strong>Destino:</strong> {flight.name} </span>
+                                    </div>
+                                    <div className="col-sm"> 
+                                        <span>  <strong>Precio:</strong> {flight.price} ETH</span>
+                                    </div>                                                                      
+                                </div>                               
                             </div>
                         })}
                     </Panel>
