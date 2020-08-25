@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Panel from "./Panel";
 import getWeb3 from "./getWeb3";
-import AirlineContract from "./airline";
-import { AirlineService } from "./airlineService";
+import TransporteContract from "./transporte";
+import { TransporteService } from "./transporteService";
 import { ToastContainer } from "react-toastr";
 
 const converter = (web3) => {
@@ -19,8 +19,8 @@ export class App extends Component {
             balance: 0,
             refundableEther: 0,
             account: undefined,
-            flights: [],
-            customerFlights: []
+            pasajes: [],
+            customerPasajes: []
         };
     }
 
@@ -28,21 +28,21 @@ export class App extends Component {
 
         this.web3 = await getWeb3();
         this.toEther = converter(this.web3);
-        this.airline = await AirlineContract(this.web3.currentProvider);
-        this.airlineService = new AirlineService(this.airline);
+        this.transporte = await TransporteContract(this.web3.currentProvider);
+        this.transporteService = new TransporteService(this.transporte);
 
         var account = (await this.web3.eth.getAccounts())[0];
 
-        let flightPurchased = this.airline.FlightPurchased();
-        flightPurchased.watch(function (err, result) {
+        let pasajeComprado = this.transporte.PasajeComprado();
+        pasajeComprado.watch(function (err, result) {
 
-            const { customer, price, flight } = result.args;
+            const { customer, precio, pasaje } = result.args;
 
             if (customer === this.state.account) {
-                console.log(`Has comprado una pasaje a ${flight} por el precio de ${price} ETH`);
+                console.log(`Has comprado una pasaje a ${pasaje} por el precio de ${precio} ETH`);
             } else {
-                this.container.success(`El último cliente compró un pasaje a ${flight}
-                por el precio de ${price} ETH`, 'Informacion de Compra');
+                this.container.success(`El último cliente compró un pasaje a ${pasaje}
+                por el precio de ${precio} ETH`, 'Informacion de Compra');
             }
 
         }.bind(this));
@@ -70,45 +70,45 @@ export class App extends Component {
         });
     }
 
-    async getFlights() {
-        let flights = await this.airlineService.getFlights();
+    async getPasajes() {
+        let pasajes = await this.transporteService.getPasajes();
         this.setState({
-            flights
+            pasajes
         });
     }
 
-    async getRefundableEther() {
-        let refundableEther = this.toEther((await this.airlineService.getRefundableEther(this.state.account)));
+    async getReembolsoEther() {
+        let refundableEther = this.toEther((await this.transporteService.getReembolsoEther(this.state.account)));
         this.setState({
             refundableEther
         });
     }
 
     async refundLoyaltyPoints() {
-        await this.airlineService.redeemLoyaltyPoints(this.state.account);
+        await this.transporteService.canjearPuntosFidelidad(this.state.account);
     }
 
-    async getCustomerFlights() {
-        let customerFlights = await this.airlineService.getCustomerFlights(this.state.account);
+    async getCustomerPasajes() {
+        let customerPasajes = await this.transporteService.getCustomerPasajes(this.state.account);
         this.setState({
-            customerFlights
+            customerPasajes
         });
     }
 
-    async buyFlight(flightIndex, flight) {
+    async comprarPasaje(pasajeIndex, pasaje) {
 
-        await this.airlineService.buyFlight(
-            flightIndex,
+        await this.transporteService.comprarPasaje(
+            pasajeIndex,
             this.state.account,
-            flight.price
+            pasaje.precio
         );
     }
 
     async load() {
         this.getBalance();
-        this.getFlights();
-        this.getCustomerFlights();
-        this.getRefundableEther();
+        this.getPasajes();
+        this.getCustomerPasajes();
+        this.getReembolsoEther();
     }
 
     render() {
@@ -131,17 +131,17 @@ export class App extends Component {
                 </div>
                 <div className="col-sm">
                     <Panel title="Destinos - Perú" style={{backgroundColor: "#47484A" }}>
-                        {this.state.flights.map((flight, i) => {
+                        {this.state.pasajes.map((pasaje, i) => {
                             return <div key={i}>
                                 <div className="row">
                                     <div className="col-sm"> 
-                                        <span>{flight.name} </span>
+                                        <span>{pasaje.nombre} </span>
                                     </div>
                                     <div className="col-sm"> 
-                                        <span> Precio: {this.toEther(flight.price)} ETH</span>
+                                        <span> Precio: {this.toEther(pasaje.precio)} ETH</span>
                                     </div>                                    
                                     <div className="col-sm"> 
-                                    <button className="btn btn-success text-white" onClick={() => this.buyFlight(i, flight)}>Comprar pasaje</button>
+                                    <button className="btn btn-success text-white" onClick={() => this.comprarPasaje(i, pasaje)}>Comprar pasaje</button>
                                     </div>                                    
                                 </div>
 
@@ -155,7 +155,7 @@ export class App extends Component {
 
                 <div className="col-sm">
                     <Panel title="Historial de mis compras" style={{backgroundColor: "#47484A" }}>
-                        {this.state.customerFlights.map((flight, i) => {
+                        {this.state.customerPasajes.map((pasaje, i) => {
                             return <div key={i}>
 
                                <div className="row">
@@ -163,10 +163,10 @@ export class App extends Component {
                                         <span> Pasaje comprado...  </span>
                                     </div>                                   
                                     <div className="col-sm"> 
-                                        <span> <strong>Destino:</strong> {flight.name} </span>
+                                        <span> <strong>Destino:</strong> {pasaje.nombre} </span>
                                     </div>
                                     <div className="col-sm"> 
-                                        <span>  <strong>Precio:</strong> {flight.price} ETH</span>
+                                        <span>  <strong>Precio:</strong> {pasaje.precio} ETH</span>
                                     </div>                                                                      
                                 </div>                               
                             </div>

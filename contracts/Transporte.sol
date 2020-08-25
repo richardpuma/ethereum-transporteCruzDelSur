@@ -6,46 +6,52 @@ contract Transporte {
 
   struct Customer {
       uint loyaltyPoints;
-      uint totalViajes;
+      uint totalPasajes;
   }  
 
-  struct Viaje {
+  struct Pasaje {
       string nombre;
       uint256 precio;
   }
 
   uint etherPerPoint = 0.5 ether;
 
-  Viaje[] public viajes;
+  Pasaje[] public pasajes;
 
   mapping(address => Customer) public customers;
-  mapping(address => Viaje[]) public customerViajes;
-  mapping(address => uint) public customerTotalViajes;
+  mapping(address => Pasaje[]) public customerPasajes;
+  mapping(address => uint) public customerTotalPasajes;
   
-  event ViajeComprado(address indexed customer, uint precio, string viaje);
+  event PasajeComprado(address indexed customer, uint precio, string pasaje);
 
   constructor() {
       owner = msg.sender;   
-      viajes.push(Viaje('Ica', 4 ether));
-      viajes.push(Viaje('Cusco', 3 ether));
-      viajes.push(Viaje('Piura', 3 ether));
+      pasajes.push(Pasaje('AREQUIPA', 3 ether));
+      pasajes.push(Pasaje('CAJAMARCA', 4 ether));
+      pasajes.push(Pasaje('CHICLAYO', 3 ether));
+      pasajes.push(Pasaje('HUARAZ', 3 ether));
+      pasajes.push(Pasaje('LIMA', 4 ether));
+      pasajes.push(Pasaje('TRUJILLO', 3 ether));
+      pasajes.push(Pasaje('PIURA', 3 ether));
+      pasajes.push(Pasaje('TUMBES', 4 ether));
+      pasajes.push(Pasaje('TACNA', 3 ether));      
   }   
 
-  function comprarViaje(uint viajeIndex) public payable {
-      Viaje viaje = viajes[viajeIndex];
-      require(msg.value == viaje.precio);
+  function comprarPasaje(uint pasajeIndex) public payable {
+      Pasaje pasaje = pasajes[pasajeIndex];
+      require(msg.value == pasaje.precio);
 
       Customer storage customer = customers[msg.sender];
       customer.loyaltyPoints += 5;
-      customer.totalViajes += 1;
-      customerViajes[msg.sender].push(viaje);
-      customerTotalViajes[msg.sender] ++;
+      customer.totalPasajes += 1;
+      customerPasajes[msg.sender].push(pasaje);
+      customerTotalPasajes[msg.sender] ++;
 
-      ViajeComprado(msg.sender, viaje.precio, viaje.nombre);
+      PasajeComprado(msg.sender, pasaje.precio, pasaje.nombre);
   }
 
-  function totalViajes() public view returns (uint) {
-      return viajes.length;
+  function totalPasajes() public view returns (uint) {
+      return pasajes.length;
   }
 
   function canjearPuntosFidelidad() public {
@@ -59,9 +65,9 @@ contract Transporte {
       return etherPerPoint * customers[msg.sender].loyaltyPoints;
   }
 
-  function getViajeBalance() public isOwner view returns (uint) {
-      address viajeAddress = this;
-      return viajeAddress.balance;
+  function getPasajeBalance() public isOwner view returns (uint) {
+      address pasajeAddress = this;
+      return pasajeAddress.balance;
   }
 
   modifier isOwner() {
